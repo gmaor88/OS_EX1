@@ -8,6 +8,7 @@
 #define INPUT_STRING_LEN 16
 #define True 1
 #define False 0
+#define NEW_POLIGON_MASK 0x2
 
 typedef struct _vertex {
 	float x, y;
@@ -36,7 +37,7 @@ void analyze_and_exec(long long unsigned poligon);
 long long unsigned get_poligon_from_user();
 void populate_function_array();
 void init_poligon_list();
-void update_continue_flag(long long unsigned poligon);
+int is_end_of_input(long long unsigned poligon);
 void free_poligon_list(ListNode* currentNode);
 
 
@@ -52,18 +53,18 @@ void(*function_array[6]);
 List* poligon_list;
 
 void main() {
-	long long unsigned poligon;
-	int continue_flag = 1;
+	long long unsigned poligon = 0;
 
 	populate_function_array();
 	init_poligon_list();
 
-	while (continue_flag)
+	while (True)
 	{
 		poligon = get_poligon_from_user();
 		analyze_and_exec(poligon);
-		
-		update_continue_flag(poligon);
+		if (is_end_of_input(poligon)) {
+			break;
+		}
 	}
 
 	free_poligon_list(poligon_list->head);
@@ -71,19 +72,17 @@ void main() {
 
 
 void analyze_and_exec(long long unsigned poligon) {
+	if (poligon & NEW_POLIGON_MASK) {
+		add_polygon(poligon);
+	}
+
 
 }
 
 long long unsigned get_poligon_from_user() {
-	char input_string[INPUT_STRING_LEN];
 	long long unsigned poligon = 0;
 
-	for (size_t i = 0; i < INPUT_STRING_LEN; i++)
-	{
-		scanf("%s", input_string[i]);
-	}
-
-	sscanf(input_string, "%x", &poligon);
+	scanf("%llx", &poligon);
 
 	return poligon;
 }
@@ -100,11 +99,13 @@ void populate_function_array() {
 void init_poligon_list() {
 	poligon_list = (List*)malloc(sizeof(List));
 	ListNode* dummy = (ListNode*)malloc(sizeof(ListNode));
+	dummy->polygon = 0;
+	dummy->next = NULL;
 	
 	poligon_list->head = poligon_list->tail = dummy;
 }
 
-void update_continue_flag(long long unsigned poligon) {
+int is_end_of_input(long long unsigned poligon) {
 	long long unsigned mask = 1;
 
 	if (poligon & mask) {
