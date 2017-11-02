@@ -1,3 +1,5 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -106,10 +108,10 @@ void update_continue_flag(long long unsigned poligon) {
 	long long unsigned mask = 1;
 
 	if (poligon & mask) {
-		return True;
+		return False;
 	}
 
-	return False;
+	return True;
 }
 
 void free_poligon_list(ListNode* currentNode) {
