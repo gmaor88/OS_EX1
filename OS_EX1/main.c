@@ -30,21 +30,21 @@ typedef struct list {
 }List;
 
 
+void analize_and_exec(long long unsigned poligon);
+long long unsigned get_poligon_from_user();
+void populate_function_array();
+void init_poligon_list();
 void update_continue_flag(long long unsigned poligon);
+void free_poligon_list(ListNode* currentNode);
 
 
 void add_polygon(long long unsigned poligon);
-// add new polygon to the list
 void perimeter(long long unsigned poligon);
-// calculate and print the perimeter
 void area(long long unsigned poligon);
-// calculate and print the area
 void print_polygon(long long unsigned poligon);
-// print the type of polygon and its vertices
 void do_current(long long unsigned poligon);
-// do the operations on the current polygon.
 void do_all(long long unsigned poligon);
-// do the operations in the parameter on the list
+
 
 void(*function_array[6]);
 List* poligon_list;
@@ -59,15 +59,18 @@ void main() {
 	while (continue_flag)
 	{
 		poligon = get_poligon_from_user();
-
-
+		analize_and_exec(poligon);
+		
 		update_continue_flag(poligon);
 	}
 
 	free_poligon_list(poligon_list->head);
-
 }
 
+
+void analize_and_exec(long long unsigned poligon) {
+
+}
 
 long long unsigned get_poligon_from_user() {
 	char input_string[INPUT_STRING_LEN];
@@ -80,7 +83,7 @@ long long unsigned get_poligon_from_user() {
 
 	sscanf(input_string, "%x", &poligon);
 
-
+	return poligon;
 }
 
 void populate_function_array() {
@@ -115,4 +118,35 @@ void free_poligon_list(ListNode* currentNode) {
 	}
 	
 	free(currentNode);
+}
+
+
+/* add new polygon to the list*/
+void add_polygon(long long unsigned poligon) {
+
+}
+
+/* calculate and print the perimeter */
+void perimeter(long long unsigned poligon) {
+
+}
+
+/* calculate and print the area */
+void area(long long unsigned poligon) {
+
+}
+
+/* print the type of polygon and its vertices */
+void print_polygon(long long unsigned poligon) {
+
+}
+
+/* do the operations on the current polygon */
+void do_current(long long unsigned poligon) {
+
+}
+
+/* do the operations in the parameter on the list */
+void do_all(long long unsigned poligon) {
+
 }
