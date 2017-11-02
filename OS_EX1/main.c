@@ -32,7 +32,7 @@ typedef struct list {
 }List;
 
 
-void analize_and_exec(long long unsigned poligon);
+void analyze_and_exec(long long unsigned poligon);
 long long unsigned get_poligon_from_user();
 void populate_function_array();
 void init_poligon_list();
@@ -61,7 +61,7 @@ void main() {
 	while (continue_flag)
 	{
 		poligon = get_poligon_from_user();
-		analize_and_exec(poligon);
+		analyze_and_exec(poligon);
 		
 		update_continue_flag(poligon);
 	}
@@ -70,7 +70,7 @@ void main() {
 }
 
 
-void analize_and_exec(long long unsigned poligon) {
+void analyze_and_exec(long long unsigned poligon) {
 
 }
 
