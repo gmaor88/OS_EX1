@@ -11,8 +11,8 @@
 /**************************************************/
 ///					Define						///
 /**************************************************/
-#define True									1
-#define False									0
+#define TRUE									1
+#define FALSE									0
 #define NUM_OF_VERTICES_IN_TRIANGLE				3
 #define NUM_OF_VERTICES_IN_QUAD					4
 #define INPUT_STRING_LEN						16
@@ -28,6 +28,7 @@
 #define POLYGONS_TO_DO_ACTIONS_ON_MASK			0xc0   
 #define COORDINATES_MASK						0xFFF
 #define COORDINATES_VALUE_MASK					0x3f
+#define SIGN_BIT_MASK							0x20
 #define	SHIFT_TO_FIRST_VERTEX					8
 #define SHIFT_TO_SECOND_VERTEX					20
 #define SHIFT_TO_THIRD_VERTEX					32
@@ -40,7 +41,7 @@
 ///				Typedef And Structs				///
 /**************************************************/
 typedef struct _vertex {
-	float x, y;
+	int x, y;
 } Vertex;
 
 typedef struct _triangle {
@@ -102,7 +103,7 @@ void main() {
 	populate_functions_array();
 	init_poligon_list();
 
-	while (True)
+	while (TRUE)
 	{
 		poligon = get_poligon_from_user();
 		analyze_and_exec(poligon);
@@ -123,6 +124,7 @@ void analyze_and_exec(long long unsigned poligon) {
 	if (poligon & NEW_POLIGON_MASK) {
 		functions_array[0](poligon);
 	}
+
 
 
 }
@@ -170,7 +172,6 @@ void free_poligon_list(ListNode* currentNode) {
 	
 	free(currentNode);
 }
-
 
 
 
