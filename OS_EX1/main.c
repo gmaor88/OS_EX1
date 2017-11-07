@@ -33,6 +33,7 @@
 #define SHIFT_TO_SECOND_VERTEX					20
 #define SHIFT_TO_THIRD_VERTEX					32
 #define SHIFT_TO_FOURTH_VERTEX					44
+#define SHIFT_TO_NEXT_VERTEX					12
 #define SHIFT_TO_Y_VALUE						6
 
 /***************************************************/
@@ -121,11 +122,30 @@ void main() {
 ///				Implementations					///
 /**************************************************/
 void analyze_and_exec(long long unsigned poligon) {
+	int actions_to_preform[3];
+	int preform_for = -1;
+	
 	if (poligon & NEW_POLIGON_MASK) {
 		functions_array[0](poligon);
 	}
 
-
+	populate_actions_to_preform_array(actions_to_preform, poligon);
+	preform_for = get_on_who_to_preform(poligon);
+	switch (preform_for)
+	{
+	case 0:
+		functions_array[4](poligon);
+		break;
+	case 1:
+		break;
+	case 2:
+		break;
+	case 3:
+		functions_array[6](poligon);
+		break;
+	default:
+		break;
+	}
 
 }
 
@@ -159,10 +179,10 @@ int is_end_of_input(long long unsigned poligon) {
 	long long unsigned mask = 1;
 
 	if (poligon & mask) {
-		return False;
+		return FALSE;
 	}
 
-	return True;
+	return TRUE;
 }
 
 void free_poligon_list(ListNode* currentNode) {
@@ -171,6 +191,34 @@ void free_poligon_list(ListNode* currentNode) {
 	}
 	
 	free(currentNode);
+}
+
+
+void print_all_vertices(long long unsigned poligon, int is_quad) {
+	int num_of_vertices = NUM_OF_VERTICES_IN_TRIANGLE;
+	
+	if (poligon & NEW_POLIGON_MASK == 0) {
+		return;
+	}
+	
+	if (is_quad) {
+		num_of_vertices = NUM_OF_VERTICES_IN_QUAD;
+	}
+
+	poligon = poligon >> SHIFT_TO_FIRST_VERTEX;
+	for (size_t i = 0; i < num_of_vertices; i++)
+	{
+		char x = 0, y = 0;
+		short vertex = poligon | vertex;
+		//vertex = poligon | vertex;
+		vertex = vertex & COORDINATES_MASK;
+		x = vertex & COORDINATES_VALUE_MASK;
+		vertex >= SHIFT_TO_Y_VALUE;
+		y = vertex & COORDINATES_VALUE_MASK;
+
+		printf(" {%d, %d}", (int)x, (int)y);
+		poligon = poligon >> SHIFT_TO_NEXT_VERTEX;
+	}
 }
 
 
@@ -198,7 +246,19 @@ void area(long long unsigned poligon) {
 
 /* print the type of polygon and its vertices */
 void print_polygon(long long unsigned poligon) {
+	int is_quad = FALSE;
+	
+	if (poligon & POLYGON_TYPE_MASK) {
+		is_quad = TRUE;
+		printf("%s", "square");
+	}
+	else
+	{
+		printf("%s", "triangle");
+	}
 
+	print_all_vertices(poligon, is_quad);
+	printf("%s", "\r\n");
 }
 
 /* do the operations on the current polygon */
