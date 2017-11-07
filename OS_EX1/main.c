@@ -84,9 +84,11 @@ int is_end_of_input(long long unsigned poligon);
 void free_poligon_list(ListNode* currentNode);
 
 void print_all_vertices(long long unsigned poligon, int is_quad);
-void print_triangle_area(poligon);
-void print_triangle_perimeter(poligon);
+void print_triangle_area(long long unsigned poligon);
+void print_triangle_perimeter(long long unsigned poligon);
 double calc_distance(Vertex vertex1, Vertex vertex2);
+void print_quad_area(long long unsigned poligon);
+void print_quad_perimeter(long long unsigned poligon);
 
 void add_polygon(long long unsigned poligon);
 void perimeter(long long unsigned poligon);
@@ -141,6 +143,8 @@ void analyze_and_exec(long long unsigned poligon) {
 
 	//testing the print func
 	functions_array[PRINT_POLIGON](poligon);
+	functions_array[PERIMETER](poligon);
+	functions_array[AREA](poligon);
 
 	/*populate_actions_to_preform_array(actions_to_preform, poligon);
 	preform_for = get_on_who_to_preform(poligon);
@@ -222,24 +226,23 @@ void print_all_vertices(long long unsigned poligon, int is_quad) {
 	poligon = poligon >> SHIFT_TO_FIRST_VERTEX;
 	for (size_t i = 0; i < num_of_vertices; i++)
 	{
-		long long unsigned  vertex = COORDINATES_MASK;
+		long long unsigned vertex = COORDINATES_MASK;
 		short x = 0, y = 0;
-		//vertex = poligon | vertex;
-		//vertex = vertex & COORDINATES_MASK;
+
 		vertex = poligon & vertex;
 		x = vertex & COORDINATES_VALUE_MASK;
 		vertex = vertex >> SHIFT_TO_Y_VALUE;
 		y = vertex & COORDINATES_VALUE_MASK;
-
 		printf(" {%d, %d}", (int)x, (int)y);
 		poligon = poligon >> SHIFT_TO_NEXT_VERTEX;
 	}
 }
 
-void print_triangle_area(poligon) {
+void print_triangle_area(long long unsigned poligon) {
 	Triangle triangle;
 	double culc_area;
 
+	poligon = poligon >> SHIFT_TO_FIRST_VERTEX;
 	for (size_t i = 0; i < NUM_OF_VERTICES_IN_TRIANGLE; i++)
 	{
 		long long unsigned  vertex = COORDINATES_MASK;
@@ -267,10 +270,11 @@ void print_triangle_area(poligon) {
 	printf("%.1f", culc_area);
 }
 
-void print_triangle_perimeter(poligon) {
+void print_triangle_perimeter(long long unsigned poligon) {
 	Triangle triangle;
 	double culc_perimeter, distance1, distance2, distance3;
 
+	poligon = poligon >> SHIFT_TO_FIRST_VERTEX;
 	for (size_t i = 0; i < NUM_OF_VERTICES_IN_TRIANGLE; i++)
 	{
 		long long unsigned  vertex = COORDINATES_MASK;
@@ -299,6 +303,60 @@ double calc_distance(Vertex vertex1, Vertex vertex2)
 	double distance;
 	return distance = sqrt(pow(vertex1.x - vertex2.x, 2) + pow(vertex1.y - vertex2.y, 2));
 }
+
+void print_quad_area(long long unsigned poligon) {
+	Quad quad;
+	double culc_area, distance1, distance2;
+
+	poligon = poligon >> SHIFT_TO_FIRST_VERTEX;
+	for (size_t i = 0; i < NUM_OF_VERTICES_IN_QUAD; i++)
+	{
+		long long unsigned vertex = COORDINATES_MASK;
+		short x = 0, y = 0;
+
+		vertex = poligon & vertex;
+		x = vertex & COORDINATES_VALUE_MASK;
+		vertex = vertex >> SHIFT_TO_Y_VALUE;
+		y = vertex & COORDINATES_VALUE_MASK;
+		quad.vertices[i].x = (int)x;
+		quad.vertices[i].y = (int)y;
+		poligon = poligon >> SHIFT_TO_NEXT_VERTEX;
+	}
+
+	distance1 = calc_distance(quad.vertices[0], quad.vertices[1]);
+	distance2 = calc_distance(quad.vertices[0], quad.vertices[3]);
+	culc_area = distance1 * distance2;
+
+	printf("%.1f", culc_area);
+}
+
+void print_quad_perimeter(long long unsigned poligon) {
+	Quad quad;
+	double culc_perimeter, distance1, distance2;
+
+	poligon = poligon >> SHIFT_TO_FIRST_VERTEX;
+	for (size_t i = 0; i < NUM_OF_VERTICES_IN_QUAD; i++)
+	{
+		long long unsigned  vertex = COORDINATES_MASK;
+		short x = 0, y = 0;
+
+		vertex = poligon & vertex;
+		x = vertex & COORDINATES_VALUE_MASK;
+		vertex = vertex >> SHIFT_TO_Y_VALUE;
+		y = vertex & COORDINATES_VALUE_MASK;
+
+		quad.vertices[i].x = (int)x;
+		quad.vertices[i].y = (int)y;
+		poligon = poligon >> SHIFT_TO_NEXT_VERTEX;
+	}
+
+	distance1 = calc_distance(quad.vertices[0], quad.vertices[1]);
+	distance2 = calc_distance(quad.vertices[0], quad.vertices[3]);
+	culc_perimeter = (distance1 * 2)+ (distance2 * 2);
+
+	printf("%.1f", culc_perimeter);
+}
+
 
 
 /* add new polygon to the list*/
