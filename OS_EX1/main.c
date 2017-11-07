@@ -84,6 +84,9 @@ int is_end_of_input(long long unsigned poligon);
 void free_poligon_list(ListNode* currentNode);
 
 void print_all_vertices(long long unsigned poligon, int is_quad);
+void print_triangle_area(poligon);
+void print_triangle_perimeter(poligon);
+double calc_distance(Vertex vertex1, Vertex vertex2);
 
 void add_polygon(long long unsigned poligon);
 void perimeter(long long unsigned poligon);
@@ -204,6 +207,7 @@ void free_poligon_list(ListNode* currentNode) {
 }
 
 
+
 void print_all_vertices(long long unsigned poligon, int is_quad) {
 	int num_of_vertices = NUM_OF_VERTICES_IN_TRIANGLE;
 	
@@ -232,6 +236,69 @@ void print_all_vertices(long long unsigned poligon, int is_quad) {
 	}
 }
 
+void print_triangle_area(poligon) {
+	Triangle triangle;
+	double culc_area;
+
+	for (size_t i = 0; i < NUM_OF_VERTICES_IN_TRIANGLE; i++)
+	{
+		long long unsigned  vertex = COORDINATES_MASK;
+		short x = 0, y = 0;
+
+		vertex = poligon & vertex;
+		x = vertex & COORDINATES_VALUE_MASK;
+		vertex = vertex >> SHIFT_TO_Y_VALUE;
+		y = vertex & COORDINATES_VALUE_MASK;
+
+		triangle.vertices[i].x = (int)x;
+		triangle.vertices[i].y = (int)y;
+		poligon = poligon >> SHIFT_TO_NEXT_VERTEX;
+	}
+
+	// area = 0.5 * |x_0y_1 + x_1y_2 + x_2y_0 - x_1y_0 - x_2y_1 - x_0y_2|
+	culc_area = 0.5 * fabs(
+		triangle.vertices[0].x * triangle.vertices[1].y +
+		triangle.vertices[1].x * triangle.vertices[2].y +
+		triangle.vertices[2].x * triangle.vertices[0].y -
+		triangle.vertices[1].x * triangle.vertices[0].y -
+		triangle.vertices[2].x * triangle.vertices[1].y -
+		triangle.vertices[0].x * triangle.vertices[2].y);
+
+	printf("%.1f", culc_area);
+}
+
+void print_triangle_perimeter(poligon) {
+	Triangle triangle;
+	double culc_perimeter, distance1, distance2, distance3;
+
+	for (size_t i = 0; i < NUM_OF_VERTICES_IN_TRIANGLE; i++)
+	{
+		long long unsigned  vertex = COORDINATES_MASK;
+		short x = 0, y = 0;
+
+		vertex = poligon & vertex;
+		x = vertex & COORDINATES_VALUE_MASK;
+		vertex = vertex >> SHIFT_TO_Y_VALUE;
+		y = vertex & COORDINATES_VALUE_MASK;
+
+		triangle.vertices[i].x = (int)x;
+		triangle.vertices[i].y = (int)y;
+		poligon = poligon >> SHIFT_TO_NEXT_VERTEX;
+	}
+
+	distance1 = calc_distance(triangle.vertices[0], triangle.vertices[1]);
+	distance2 = calc_distance(triangle.vertices[1], triangle.vertices[2]);
+	distance3 = calc_distance(triangle.vertices[2], triangle.vertices[0]);
+	culc_perimeter = distance1 + distance2 + distance3;
+
+	printf("%.1f", culc_perimeter);
+}
+
+double calc_distance(Vertex vertex1, Vertex vertex2)
+{
+	double distance;
+	return distance = sqrt(pow(vertex1.x - vertex2.x, 2) + pow(vertex1.y - vertex2.y, 2));
+}
 
 
 /* add new polygon to the list*/
@@ -247,12 +314,38 @@ void add_polygon(long long unsigned poligon) {
 
 /* calculate and print the perimeter */
 void perimeter(long long unsigned poligon) {
+	if (poligon & NEW_POLIGON_MASK == 0) {
+		return;
+	}
 
+	printf(" perimeter = ");
+	if (poligon & POLYGON_TYPE_MASK) {
+		print_quad_perimeter(poligon);
+	}
+	else
+	{
+		print_triangle_perimeter(poligon);
+	}
+
+	printf("%s", "\r\n");
 }
 
 /* calculate and print the area */
 void area(long long unsigned poligon) {
+	if (poligon & NEW_POLIGON_MASK == 0) {
+		return;
+	}
 
+	printf(" area = ");
+	if (poligon & POLYGON_TYPE_MASK) {
+		print_quad_area(poligon);
+	}
+	else
+	{
+		print_triangle_area(poligon);
+	}
+
+	printf("%s", "\r\n");
 }
 
 /* print the type of polygon and its vertices */
