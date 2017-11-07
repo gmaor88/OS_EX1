@@ -31,6 +31,9 @@
 #define NEW_POLIGON_MASK						0x2
 #define POLYGON_TYPE_MASK						0x4
 #define ACTIONS_MASK							0x38
+#define PRINT_ACTION_REQUESTED					8
+#define PERIMITER_ACTION_REQUESTED				16
+#define AREA_ACTION_REQUESTED					32
 #define POLYGONS_TO_DO_ACTIONS_ON_MASK			0xc0   
 #define COORDINATES_MASK						0xFFF
 #define COORDINATES_VALUE_MASK					0x3f
@@ -41,6 +44,7 @@
 #define SHIFT_TO_FOURTH_VERTEX					44
 #define SHIFT_TO_NEXT_VERTEX					12
 #define SHIFT_TO_Y_VALUE						6
+#define SHIFT_TO_GET_0_TO_4_VALUE				6
 
 /***************************************************/
 
@@ -83,6 +87,8 @@ void init_poligon_list();
 int is_end_of_input(long long unsigned poligon);
 void free_poligon_list(ListNode* currentNode);
 
+int get_on_who_to_preform(long long unsigned poligon);
+int populate_actions_to_preform_array(int* actions_to_preform, long long unsigned poligon);
 void print_all_vertices(long long unsigned poligon, int is_quad);
 void print_triangle_area(long long unsigned poligon);
 void print_triangle_perimeter(long long unsigned poligon);
@@ -127,28 +133,30 @@ void main() {
 
 	free_poligon_list(poligon_list->head);
 }
-/***************************************************/
 
+/***************************************************/
 
 /**************************************************/
 ///				Implementations					///
 /**************************************************/
 void analyze_and_exec(long long unsigned poligon) {
-	int actions_to_preform[3];
-	int preform_for = -1;
+	int actions_to_preform[3], actions_to_preform_counter, preform_for = -1;
 	
 	if (poligon & NEW_POLIGON_MASK) {
 		functions_array[ADD_POLIGON](poligon);
 	}
 
-	//testing the print func
-	functions_array[PRINT_POLIGON](poligon);
-	functions_array[PERIMETER](poligon);
-	functions_array[AREA](poligon);
+	//testing funcs (print, prim, area)
+	/*functions_array[PRINT_POLIGON](poligon);
+	//functions_array[PERIMETER](poligon);
+	//functions_array[AREA](poligon);
+	*/
 
-	/*populate_actions_to_preform_array(actions_to_preform, poligon);
+	actions_to_preform_counter= populate_actions_to_preform_array(actions_to_preform, poligon);
 	preform_for = get_on_who_to_preform(poligon);
-	switch (preform_for)
+	//printf("%d, %d\r\n", preform_for, actions_to_preform_counter);
+	
+	/*switch (preform_for)
 	{
 	case 0:
 		functions_array[4](poligon);
@@ -211,6 +219,41 @@ void free_poligon_list(ListNode* currentNode) {
 }
 
 
+
+int get_on_who_to_preform(long long unsigned poligon) {
+	int choice = POLYGONS_TO_DO_ACTIONS_ON_MASK;
+
+	choice = choice & poligon;
+	choice = choice >> SHIFT_TO_GET_0_TO_4_VALUE;
+
+	return choice;
+}
+
+int populate_actions_to_preform_array(int* actions_to_preform, long long unsigned poligon) {
+	int counter = 0, choice = ACTIONS_MASK;
+
+	actions_to_preform[0] = FALSE;
+	actions_to_preform[1] = FALSE;
+	actions_to_preform[2] = FALSE;
+
+	choice = choice & poligon;
+	if (choice & PRINT_ACTION_REQUESTED) {
+		actions_to_preform[0] = TRUE;
+		counter++;
+	}
+	
+	if (choice & PERIMITER_ACTION_REQUESTED) {
+		actions_to_preform[1] = TRUE;
+		counter++;
+	}
+	
+	if (choice & AREA_ACTION_REQUESTED) {
+		actions_to_preform[2] = TRUE;
+		counter++;
+	}
+
+	return counter;
+}
 
 void print_all_vertices(long long unsigned poligon, int is_quad) {
 	int num_of_vertices = NUM_OF_VERTICES_IN_TRIANGLE;
