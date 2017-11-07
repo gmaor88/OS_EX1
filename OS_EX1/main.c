@@ -16,6 +16,12 @@
 #define NUM_OF_VERTICES_IN_TRIANGLE				3
 #define NUM_OF_VERTICES_IN_QUAD					4
 #define INPUT_STRING_LEN						16
+#define ADD_POLIGON								0
+#define PERIMETER								1
+#define AREA									2
+#define PRINT_POLIGON							3
+#define DO_CURRENT								4
+#define	DO_ALL									5
 
 /***************************************************/
 
@@ -77,6 +83,7 @@ void init_poligon_list();
 int is_end_of_input(long long unsigned poligon);
 void free_poligon_list(ListNode* currentNode);
 
+void print_all_vertices(long long unsigned poligon, int is_quad);
 
 void add_polygon(long long unsigned poligon);
 void perimeter(long long unsigned poligon);
@@ -126,10 +133,13 @@ void analyze_and_exec(long long unsigned poligon) {
 	int preform_for = -1;
 	
 	if (poligon & NEW_POLIGON_MASK) {
-		functions_array[0](poligon);
+		functions_array[ADD_POLIGON](poligon);
 	}
 
-	populate_actions_to_preform_array(actions_to_preform, poligon);
+	//testing the print func
+	functions_array[PRINT_POLIGON](poligon);
+
+	/*populate_actions_to_preform_array(actions_to_preform, poligon);
 	preform_for = get_on_who_to_preform(poligon);
 	switch (preform_for)
 	{
@@ -145,7 +155,7 @@ void analyze_and_exec(long long unsigned poligon) {
 		break;
 	default:
 		break;
-	}
+	}*/
 
 }
 
@@ -179,10 +189,10 @@ int is_end_of_input(long long unsigned poligon) {
 	long long unsigned mask = 1;
 
 	if (poligon & mask) {
-		return FALSE;
+		return TRUE;
 	}
 
-	return TRUE;
+	return FALSE;
 }
 
 void free_poligon_list(ListNode* currentNode) {
@@ -208,12 +218,13 @@ void print_all_vertices(long long unsigned poligon, int is_quad) {
 	poligon = poligon >> SHIFT_TO_FIRST_VERTEX;
 	for (size_t i = 0; i < num_of_vertices; i++)
 	{
-		char x = 0, y = 0;
-		short vertex = poligon | vertex;
+		long long unsigned  vertex = COORDINATES_MASK;
+		short x = 0, y = 0;
 		//vertex = poligon | vertex;
-		vertex = vertex & COORDINATES_MASK;
+		//vertex = vertex & COORDINATES_MASK;
+		vertex = poligon & vertex;
 		x = vertex & COORDINATES_VALUE_MASK;
-		vertex >= SHIFT_TO_Y_VALUE;
+		vertex = vertex >> SHIFT_TO_Y_VALUE;
 		y = vertex & COORDINATES_VALUE_MASK;
 
 		printf(" {%d, %d}", (int)x, (int)y);
