@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+
 /***************************************************/
 
 /**************************************************/
@@ -22,6 +23,8 @@
 #define PRINT_POLIGON							3
 #define DO_CURRENT								4
 #define	DO_ALL									5
+#define TRIANGLE								0
+#define QUAD									4
 
 /***************************************************/
 
@@ -38,6 +41,7 @@
 #define COORDINATES_MASK						0xFFF
 #define COORDINATES_VALUE_MASK					0x3f
 #define SIGN_BIT_MASK							0x20
+#define NEGATIVE_BIT_MASK						0xFFC0
 #define	SHIFT_TO_FIRST_VERTEX					8
 #define SHIFT_TO_SECOND_VERTEX					20
 #define SHIFT_TO_THIRD_VERTEX					32
@@ -96,6 +100,7 @@ void print_triangle_perimeter(long long unsigned poligon);
 double calc_distance(Vertex vertex1, Vertex vertex2);
 void print_quad_area(long long unsigned poligon);
 void print_quad_perimeter(long long unsigned poligon);
+void handle_negatinve(int* n);
 
 void add_polygon(long long unsigned poligon);
 void perimeter(long long unsigned poligon);
@@ -133,6 +138,7 @@ void main() {
 	}
 
 	free_poligon_list(poligon_list->head);
+	free(poligon_list);
 }
 
 /***************************************************/
@@ -154,10 +160,10 @@ void analyze_and_exec(long long unsigned poligon) {
 		functions_array[DO_CURRENT](poligon);
 		break;
 	case 1:
-		do_for_all_from_shape(poligon, FALSE);
+		do_for_all_from_shape(poligon, TRIANGLE);
 		break;
 	case 2:
-		do_for_all_from_shape(poligon, TRUE);
+		do_for_all_from_shape(poligon, QUAD);
 		break;
 	case 3:
 		functions_array[DO_ALL](poligon);
@@ -213,7 +219,6 @@ void free_poligon_list(ListNode* currentNode) {
 }
 
 
-
 int get_on_who_to_preform(long long unsigned poligon) {
 	int choice = POLYGONS_TO_DO_ACTIONS_ON_MASK;
 
@@ -250,17 +255,19 @@ int populate_actions_to_preform_array(int* actions_to_preform, long long unsigne
 }
 
 void do_for_all_from_shape(long long unsigned poligon, int is_quad) {
-	int actions_to_preform[3], actions_to_preform_counter, preform_for = -1;
+	int actions_to_preform[3];
 	ListNode* curr = poligon_list->head->next;
 
 	if (!curr) {
 		return; //empty list
 	}
 
-	actions_to_preform_counter = populate_actions_to_preform_array(actions_to_preform, poligon);
+	populate_actions_to_preform_array(actions_to_preform, poligon);
 	while (curr)
 	{
-		if (poligon & POLYGON_TYPE_MASK != is_quad) {
+		int tmp = curr->polygon & POLYGON_TYPE_MASK;
+		if (tmp != is_quad) {
+			curr = curr->next;
 			continue;
 		}
 		
@@ -299,8 +306,16 @@ void print_all_vertices(long long unsigned poligon, int is_quad) {
 
 		vertex = poligon & vertex;
 		x = vertex & COORDINATES_VALUE_MASK;
+		if (x & SIGN_BIT_MASK) {
+			handle_negatinve(&x);
+		}
+
 		vertex = vertex >> SHIFT_TO_Y_VALUE;
 		y = vertex & COORDINATES_VALUE_MASK;
+		if (y & SIGN_BIT_MASK) {
+			handle_negatinve(&y);
+		}
+
 		printf(" {%d, %d}", (int)x, (int)y);
 		poligon = poligon >> SHIFT_TO_NEXT_VERTEX;
 	}
@@ -318,8 +333,15 @@ void print_triangle_area(long long unsigned poligon) {
 
 		vertex = poligon & vertex;
 		x = vertex & COORDINATES_VALUE_MASK;
+		if (x & SIGN_BIT_MASK) {
+			handle_negatinve(&x);
+		}
+
 		vertex = vertex >> SHIFT_TO_Y_VALUE;
 		y = vertex & COORDINATES_VALUE_MASK;
+		if (y & SIGN_BIT_MASK) {
+			handle_negatinve(&y);
+		}
 
 		triangle.vertices[i].x = (int)x;
 		triangle.vertices[i].y = (int)y;
@@ -350,8 +372,14 @@ void print_triangle_perimeter(long long unsigned poligon) {
 
 		vertex = poligon & vertex;
 		x = vertex & COORDINATES_VALUE_MASK;
+		if (x & SIGN_BIT_MASK) {
+			handle_negatinve(&x);
+		}
 		vertex = vertex >> SHIFT_TO_Y_VALUE;
 		y = vertex & COORDINATES_VALUE_MASK;
+		if (y & SIGN_BIT_MASK) {
+			handle_negatinve(&y);
+		}
 
 		triangle.vertices[i].x = (int)x;
 		triangle.vertices[i].y = (int)y;
@@ -384,8 +412,16 @@ void print_quad_area(long long unsigned poligon) {
 
 		vertex = poligon & vertex;
 		x = vertex & COORDINATES_VALUE_MASK;
+		if (x & SIGN_BIT_MASK) {
+			handle_negatinve(&x);
+		}
 		vertex = vertex >> SHIFT_TO_Y_VALUE;
+
 		y = vertex & COORDINATES_VALUE_MASK;
+		if (y & SIGN_BIT_MASK) {
+			handle_negatinve(&y);
+		}
+
 		quad.vertices[i].x = (int)x;
 		quad.vertices[i].y = (int)y;
 		poligon = poligon >> SHIFT_TO_NEXT_VERTEX;
@@ -410,8 +446,14 @@ void print_quad_perimeter(long long unsigned poligon) {
 
 		vertex = poligon & vertex;
 		x = vertex & COORDINATES_VALUE_MASK;
+		if (x & SIGN_BIT_MASK) {
+			handle_negatinve(&x);
+		}
 		vertex = vertex >> SHIFT_TO_Y_VALUE;
 		y = vertex & COORDINATES_VALUE_MASK;
+		if (y & SIGN_BIT_MASK) {
+			handle_negatinve(&y);
+		}
 
 		quad.vertices[i].x = (int)x;
 		quad.vertices[i].y = (int)y;
@@ -425,6 +467,12 @@ void print_quad_perimeter(long long unsigned poligon) {
 	printf("%.1f", culc_perimeter);
 }
 
+void handle_negatinve(int* n) {
+	*n |= NEGATIVE_BIT_MASK;
+	*n = ~(*n);
+	*n += 1;
+	*n *= -1;
+}
 
 
 /* add new polygon to the list*/
