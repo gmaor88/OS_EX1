@@ -17,10 +17,10 @@
 #define NUM_OF_VERTICES_IN_TRIANGLE				3
 #define NUM_OF_VERTICES_IN_QUAD					4
 #define INPUT_STRING_LEN						16
-#define ADD_POLIGON								0
+#define ADD_POLYGON								0
 #define PERIMETER								1
 #define AREA									2
-#define PRINT_POLIGON							3
+#define PRINT_POLYGON							3
 #define DO_CURRENT								4
 #define	DO_ALL									5
 #define TRIANGLE								0
@@ -31,7 +31,7 @@
 /**************************************************/
 ///				MASKS And Shift					///
 /**************************************************/
-#define NEW_POLIGON_MASK						0x2
+#define NEW_POLYGON_MASK						0x2
 #define POLYGON_TYPE_MASK						0x4
 #define ACTIONS_MASK							0x38
 #define PRINT_ACTION_REQUESTED					8
@@ -84,30 +84,32 @@ typedef void(*func_ptr)(long long unsigned);
 /**************************************************/
 ///					Prototyps					///
 /**************************************************/
-void analyze_and_exec(long long unsigned poligon);
-long long unsigned get_poligon_from_user();
+void analyze_and_exec(long long unsigned polygon);
+long long unsigned get_polygon_from_user();
 void populate_functions_array();
-void init_poligon_list();
-int is_end_of_input(long long unsigned poligon);
-void free_poligon_list(ListNode* currentNode);
+void init_polygon_list();
+int is_end_of_input(long long unsigned polygon);
+void free_polygon_list(ListNode* currentNode);
 
-int get_on_who_to_preform(long long unsigned poligon);
-int populate_actions_to_preform_array(int* actions_to_preform, long long unsigned poligon);
-void do_for_all_from_shape(long long unsigned poligon, int is_quad);
-void print_all_vertices(long long unsigned poligon, int is_quad);
-void print_triangle_area(long long unsigned poligon);
-void print_triangle_perimeter(long long unsigned poligon);
+int get_on_who_to_preform(long long unsigned polygon);
+void populate_actions_to_preform_array(int* actions_to_preform, long long unsigned polygon);
+void do_for_all_from_shape(long long unsigned polygon, int is_quad);
+void print_all_vertices(long long unsigned polygon, int is_quad);
+void print_triangle_area(long long unsigned polygon);
+void print_triangle_perimeter(long long unsigned polygon);
 double calc_distance(Vertex vertex1, Vertex vertex2);
-void print_quad_area(long long unsigned poligon);
-void print_quad_perimeter(long long unsigned poligon);
+void print_quad_area(long long unsigned polygon);
+void print_quad_perimeter(long long unsigned polygon);
 void handle_negatinve(int* n);
+void do_actions_on_polygon(int* actions_to_preform, long long unsigned polygon);
+void get_vertex(long long unsigned polygon, short* x, short*y);
 
-void add_polygon(long long unsigned poligon);
-void perimeter(long long unsigned poligon);
-void area(long long unsigned poligon);
-void print_polygon(long long unsigned poligon);
-void do_current(long long unsigned poligon);
-void do_all(long long unsigned poligon);
+void add_polygon(long long unsigned polygon);
+void perimeter(long long unsigned polygon);
+void area(long long unsigned polygon);
+void print_polygon(long long unsigned polygon);
+void do_current(long long unsigned polygon);
+void do_all(long long unsigned polygon);
 
 /***************************************************/
 
@@ -115,7 +117,7 @@ void do_all(long long unsigned poligon);
 ///						Globals					///
 /**************************************************/
 func_ptr functions_array[6];
-List* poligon_list;
+List* polygon_list;
 
 /***************************************************/
 
@@ -123,22 +125,23 @@ List* poligon_list;
 ///						Main					///
 /**************************************************/
 void main() {
-	long long unsigned poligon = 0;
+	long long unsigned polygon = 0;
 
 	populate_functions_array();
-	init_poligon_list();
+	init_polygon_list();
 
 	while (TRUE)
 	{
-		poligon = get_poligon_from_user();
-		analyze_and_exec(poligon);
-		if (is_end_of_input(poligon)) {
+		polygon = get_polygon_from_user();
+		analyze_and_exec(polygon);
+		if (is_end_of_input(polygon)) {
 			break;
 		}
 	}
 
-	free_poligon_list(poligon_list->head);
-	free(poligon_list);
+	free_polygon_list(polygon_list->head);
+	free(polygon_list);
+	//printf("done");
 }
 
 /***************************************************/
@@ -146,27 +149,27 @@ void main() {
 /**************************************************/
 ///				Implementations					///
 /**************************************************/
-void analyze_and_exec(long long unsigned poligon) {
+void analyze_and_exec(long long unsigned polygon) {
 	int preform_for = -1;
-	
-	if (poligon & NEW_POLIGON_MASK) {
-		functions_array[ADD_POLIGON](poligon);
+
+	if (polygon & NEW_POLYGON_MASK) {
+		functions_array[ADD_POLYGON](polygon);
 	}
 
-	preform_for = get_on_who_to_preform(poligon);
+	preform_for = get_on_who_to_preform(polygon);
 	switch (preform_for)
 	{
 	case 0:
-		functions_array[DO_CURRENT](poligon);
+		functions_array[DO_CURRENT](polygon);
 		break;
 	case 1:
-		do_for_all_from_shape(poligon, TRIANGLE);
+		do_for_all_from_shape(polygon, TRIANGLE);
 		break;
 	case 2:
-		do_for_all_from_shape(poligon, QUAD);
+		do_for_all_from_shape(polygon, QUAD);
 		break;
 	case 3:
-		functions_array[DO_ALL](poligon);
+		functions_array[DO_ALL](polygon);
 		break;
 	default:
 		break;
@@ -174,12 +177,12 @@ void analyze_and_exec(long long unsigned poligon) {
 
 }
 
-long long unsigned get_poligon_from_user() {
-	long long unsigned poligon = 0;
+long long unsigned get_polygon_from_user() {
+	long long unsigned polygon = 0;
 
-	scanf("%llx", &poligon);
+	scanf("%llx", &polygon);
 
-	return poligon;
+	return polygon;
 }
 
 void populate_functions_array() {
@@ -191,161 +194,121 @@ void populate_functions_array() {
 	functions_array[5] = do_all;
 }
 
-void init_poligon_list() {
-	poligon_list = (List*)malloc(sizeof(List));
+void init_polygon_list() {
+	polygon_list = (List*)malloc(sizeof(List));
 	ListNode* dummy = (ListNode*)malloc(sizeof(ListNode));
 	dummy->polygon = 0;
 	dummy->next = NULL;
-	
-	poligon_list->head = poligon_list->tail = dummy;
+
+	polygon_list->head = polygon_list->tail = dummy;
 }
 
-int is_end_of_input(long long unsigned poligon) {
+int is_end_of_input(long long unsigned polygon) {
 	long long unsigned mask = 1;
 
-	if (poligon & mask) {
+	if (polygon & mask) {
 		return TRUE;
 	}
 
 	return FALSE;
 }
 
-void free_poligon_list(ListNode* currentNode) {
+void free_polygon_list(ListNode* currentNode) {
 	if (currentNode->next) {
-		free_poligon_list(currentNode->next);
+		free_polygon_list(currentNode->next);
 	}
-	
+
 	free(currentNode);
 }
 
 
-int get_on_who_to_preform(long long unsigned poligon) {
+int get_on_who_to_preform(long long unsigned polygon) {
 	int choice = POLYGONS_TO_DO_ACTIONS_ON_MASK;
 
-	choice = choice & poligon;
+	choice = choice & polygon;
 	choice = choice >> SHIFT_TO_GET_0_TO_4_VALUE;
 
 	return choice;
 }
 
-int populate_actions_to_preform_array(int* actions_to_preform, long long unsigned poligon) {
-	int counter = 0, choice = ACTIONS_MASK;
+void populate_actions_to_preform_array(int* actions_to_preform, long long unsigned polygon) {
+	int choice = ACTIONS_MASK;
 
 	actions_to_preform[0] = FALSE;
 	actions_to_preform[1] = FALSE;
 	actions_to_preform[2] = FALSE;
 
-	choice = choice & poligon;
+	choice = choice & polygon;
 	if (choice & PRINT_ACTION_REQUESTED) {
 		actions_to_preform[0] = TRUE;
-		counter++;
 	}
-	
+
 	if (choice & PERIMITER_ACTION_REQUESTED) {
 		actions_to_preform[1] = TRUE;
-		counter++;
 	}
-	
+
 	if (choice & AREA_ACTION_REQUESTED) {
 		actions_to_preform[2] = TRUE;
-		counter++;
 	}
-
-	return counter;
 }
 
-void do_for_all_from_shape(long long unsigned poligon, int is_quad) {
+void do_for_all_from_shape(long long unsigned polygon, int is_quad) {
 	int actions_to_preform[3];
-	ListNode* curr = poligon_list->head->next;
+	ListNode* curr = polygon_list->head->next;
 
 	if (!curr) {
 		return; //empty list
 	}
 
-	populate_actions_to_preform_array(actions_to_preform, poligon);
+	populate_actions_to_preform_array(actions_to_preform, polygon);
 	while (curr)
 	{
-		int tmp = curr->polygon & POLYGON_TYPE_MASK;
-		if (tmp != is_quad) {
+		int type = curr->polygon & POLYGON_TYPE_MASK;
+		if (type != is_quad) {
 			curr = curr->next;
 			continue;
 		}
-		
-		if (actions_to_preform[0]) {
-			functions_array[PRINT_POLIGON](curr->polygon);
-		}
 
-		if (actions_to_preform[1]) {
-			functions_array[PERIMETER](curr->polygon);
-		}
-
-		if (actions_to_preform[2]) {
-			functions_array[AREA](curr->polygon);
-		}
-
+		do_actions_on_polygon(actions_to_preform, curr->polygon);
 		curr = curr->next;
 	}
 }
 
-void print_all_vertices(long long unsigned poligon, int is_quad) {
+void print_all_vertices(long long unsigned polygon, int is_quad) {
 	int num_of_vertices = NUM_OF_VERTICES_IN_TRIANGLE;
-	
-	if (poligon & NEW_POLIGON_MASK == 0) {
+
+	if (polygon & NEW_POLYGON_MASK == 0) {
 		return;
 	}
-	
+
 	if (is_quad) {
 		num_of_vertices = NUM_OF_VERTICES_IN_QUAD;
 	}
 
-	poligon = poligon >> SHIFT_TO_FIRST_VERTEX;
+	polygon = polygon >> SHIFT_TO_FIRST_VERTEX;
 	for (size_t i = 0; i < num_of_vertices; i++)
 	{
-		long long unsigned vertex = COORDINATES_MASK;
 		short x = 0, y = 0;
 
-		vertex = poligon & vertex;
-		x = vertex & COORDINATES_VALUE_MASK;
-		if (x & SIGN_BIT_MASK) {
-			handle_negatinve(&x);
-		}
-
-		vertex = vertex >> SHIFT_TO_Y_VALUE;
-		y = vertex & COORDINATES_VALUE_MASK;
-		if (y & SIGN_BIT_MASK) {
-			handle_negatinve(&y);
-		}
-
+		get_vertex(polygon, &x, &y);
 		printf(" {%d, %d}", (int)x, (int)y);
-		poligon = poligon >> SHIFT_TO_NEXT_VERTEX;
+		polygon = polygon >> SHIFT_TO_NEXT_VERTEX;
 	}
 }
 
-void print_triangle_area(long long unsigned poligon) {
+void print_triangle_area(long long unsigned polygon) {
 	Triangle triangle;
 	double culc_area;
 
-	poligon = poligon >> SHIFT_TO_FIRST_VERTEX;
+	polygon = polygon >> SHIFT_TO_FIRST_VERTEX;
 	for (size_t i = 0; i < NUM_OF_VERTICES_IN_TRIANGLE; i++)
 	{
-		long long unsigned  vertex = COORDINATES_MASK;
 		short x = 0, y = 0;
 
-		vertex = poligon & vertex;
-		x = vertex & COORDINATES_VALUE_MASK;
-		if (x & SIGN_BIT_MASK) {
-			handle_negatinve(&x);
-		}
-
-		vertex = vertex >> SHIFT_TO_Y_VALUE;
-		y = vertex & COORDINATES_VALUE_MASK;
-		if (y & SIGN_BIT_MASK) {
-			handle_negatinve(&y);
-		}
-
+		get_vertex(polygon, &x, &y);
 		triangle.vertices[i].x = (int)x;
 		triangle.vertices[i].y = (int)y;
-		poligon = poligon >> SHIFT_TO_NEXT_VERTEX;
+		polygon = polygon >> SHIFT_TO_NEXT_VERTEX;
 	}
 
 	// area = 0.5 * |x_0y_1 + x_1y_2 + x_2y_0 - x_1y_0 - x_2y_1 - x_0y_2|
@@ -360,30 +323,19 @@ void print_triangle_area(long long unsigned poligon) {
 	printf("%.1f", culc_area);
 }
 
-void print_triangle_perimeter(long long unsigned poligon) {
+void print_triangle_perimeter(long long unsigned polygon) {
 	Triangle triangle;
 	double culc_perimeter, distance1, distance2, distance3;
 
-	poligon = poligon >> SHIFT_TO_FIRST_VERTEX;
+	polygon = polygon >> SHIFT_TO_FIRST_VERTEX;
 	for (size_t i = 0; i < NUM_OF_VERTICES_IN_TRIANGLE; i++)
 	{
-		long long unsigned  vertex = COORDINATES_MASK;
 		short x = 0, y = 0;
 
-		vertex = poligon & vertex;
-		x = vertex & COORDINATES_VALUE_MASK;
-		if (x & SIGN_BIT_MASK) {
-			handle_negatinve(&x);
-		}
-		vertex = vertex >> SHIFT_TO_Y_VALUE;
-		y = vertex & COORDINATES_VALUE_MASK;
-		if (y & SIGN_BIT_MASK) {
-			handle_negatinve(&y);
-		}
-
+		get_vertex(polygon, &x, &y);
 		triangle.vertices[i].x = (int)x;
 		triangle.vertices[i].y = (int)y;
-		poligon = poligon >> SHIFT_TO_NEXT_VERTEX;
+		polygon = polygon >> SHIFT_TO_NEXT_VERTEX;
 	}
 
 	distance1 = calc_distance(triangle.vertices[0], triangle.vertices[1]);
@@ -400,31 +352,19 @@ double calc_distance(Vertex vertex1, Vertex vertex2)
 	return distance = sqrt(pow(vertex1.x - vertex2.x, 2) + pow(vertex1.y - vertex2.y, 2));
 }
 
-void print_quad_area(long long unsigned poligon) {
+void print_quad_area(long long unsigned polygon) {
 	Quad quad;
 	double culc_area, distance1, distance2;
 
-	poligon = poligon >> SHIFT_TO_FIRST_VERTEX;
+	polygon = polygon >> SHIFT_TO_FIRST_VERTEX;
 	for (size_t i = 0; i < NUM_OF_VERTICES_IN_QUAD; i++)
 	{
-		long long unsigned vertex = COORDINATES_MASK;
 		short x = 0, y = 0;
 
-		vertex = poligon & vertex;
-		x = vertex & COORDINATES_VALUE_MASK;
-		if (x & SIGN_BIT_MASK) {
-			handle_negatinve(&x);
-		}
-		vertex = vertex >> SHIFT_TO_Y_VALUE;
-
-		y = vertex & COORDINATES_VALUE_MASK;
-		if (y & SIGN_BIT_MASK) {
-			handle_negatinve(&y);
-		}
-
+		get_vertex(polygon, &x, &y);
 		quad.vertices[i].x = (int)x;
 		quad.vertices[i].y = (int)y;
-		poligon = poligon >> SHIFT_TO_NEXT_VERTEX;
+		polygon = polygon >> SHIFT_TO_NEXT_VERTEX;
 	}
 
 	distance1 = calc_distance(quad.vertices[0], quad.vertices[1]);
@@ -434,35 +374,24 @@ void print_quad_area(long long unsigned poligon) {
 	printf("%.1f", culc_area);
 }
 
-void print_quad_perimeter(long long unsigned poligon) {
+void print_quad_perimeter(long long unsigned polygon) {
 	Quad quad;
 	double culc_perimeter, distance1, distance2;
 
-	poligon = poligon >> SHIFT_TO_FIRST_VERTEX;
+	polygon = polygon >> SHIFT_TO_FIRST_VERTEX;
 	for (size_t i = 0; i < NUM_OF_VERTICES_IN_QUAD; i++)
 	{
-		long long unsigned  vertex = COORDINATES_MASK;
 		short x = 0, y = 0;
 
-		vertex = poligon & vertex;
-		x = vertex & COORDINATES_VALUE_MASK;
-		if (x & SIGN_BIT_MASK) {
-			handle_negatinve(&x);
-		}
-		vertex = vertex >> SHIFT_TO_Y_VALUE;
-		y = vertex & COORDINATES_VALUE_MASK;
-		if (y & SIGN_BIT_MASK) {
-			handle_negatinve(&y);
-		}
-
+		get_vertex(polygon, &x, &y);
 		quad.vertices[i].x = (int)x;
 		quad.vertices[i].y = (int)y;
-		poligon = poligon >> SHIFT_TO_NEXT_VERTEX;
+		polygon = polygon >> SHIFT_TO_NEXT_VERTEX;
 	}
 
 	distance1 = calc_distance(quad.vertices[0], quad.vertices[1]);
 	distance2 = calc_distance(quad.vertices[0], quad.vertices[3]);
-	culc_perimeter = (distance1 * 2)+ (distance2 * 2);
+	culc_perimeter = (distance1 * 2) + (distance2 * 2);
 
 	printf("%.1f", culc_perimeter);
 }
@@ -474,59 +403,89 @@ void handle_negatinve(int* n) {
 	*n *= -1;
 }
 
+void do_actions_on_polygon(int* actions_to_preform, long long unsigned polygon) {
+	if (actions_to_preform[0]) {
+		functions_array[PRINT_POLYGON](polygon);
+	}
+
+	if (actions_to_preform[1]) {
+		functions_array[PERIMETER](polygon);
+	}
+
+	if (actions_to_preform[2]) {
+		functions_array[AREA](polygon);
+	}
+}
+
+void get_vertex(long long unsigned polygon, short* x, short*y) {
+	long long unsigned vertex = COORDINATES_MASK;
+
+	vertex = polygon & vertex;
+	*x = vertex & COORDINATES_VALUE_MASK;
+	if (*x & SIGN_BIT_MASK) {
+		handle_negatinve(x);
+	}
+
+	vertex = vertex >> SHIFT_TO_Y_VALUE;
+	*y = vertex & COORDINATES_VALUE_MASK;
+	if (*y & SIGN_BIT_MASK) {
+		handle_negatinve(y);
+	}
+}
+
 
 /* add new polygon to the list*/
-void add_polygon(long long unsigned poligon) {
+void add_polygon(long long unsigned polygon) {
 	ListNode *node = (ListNode*)malloc(sizeof(ListNode));
 	//init mode
-	node->polygon = poligon;
+	node->polygon = polygon;
 	node->next = NULL;
 	//add to list and set the list new tail
-	poligon_list->tail->next = node;
-	poligon_list->tail = node;
+	polygon_list->tail->next = node;
+	polygon_list->tail = node;
 }
 
 /* calculate and print the perimeter */
-void perimeter(long long unsigned poligon) {
-	if (poligon & NEW_POLIGON_MASK == 0) {
+void perimeter(long long unsigned polygon) {
+	if (polygon & NEW_POLYGON_MASK == 0) {
 		return;
 	}
 
 	printf(" perimeter = ");
-	if (poligon & POLYGON_TYPE_MASK) {
-		print_quad_perimeter(poligon);
+	if (polygon & POLYGON_TYPE_MASK) {
+		print_quad_perimeter(polygon);
 	}
 	else
 	{
-		print_triangle_perimeter(poligon);
+		print_triangle_perimeter(polygon);
 	}
 
 	printf("%s", "\r\n");
 }
 
 /* calculate and print the area */
-void area(long long unsigned poligon) {
-	if (poligon & NEW_POLIGON_MASK == 0) {
+void area(long long unsigned polygon) {
+	if (polygon & NEW_POLYGON_MASK == 0) {
 		return;
 	}
 
 	printf(" area = ");
-	if (poligon & POLYGON_TYPE_MASK) {
-		print_quad_area(poligon);
+	if (polygon & POLYGON_TYPE_MASK) {
+		print_quad_area(polygon);
 	}
 	else
 	{
-		print_triangle_area(poligon);
+		print_triangle_area(polygon);
 	}
 
 	printf("%s", "\r\n");
 }
 
 /* print the type of polygon and its vertices */
-void print_polygon(long long unsigned poligon) {
+void print_polygon(long long unsigned polygon) {
 	int is_quad = FALSE;
-	
-	if (poligon & POLYGON_TYPE_MASK) {
+
+	if (polygon & POLYGON_TYPE_MASK) {
 		is_quad = TRUE;
 		printf("%s", "square");
 	}
@@ -535,56 +494,35 @@ void print_polygon(long long unsigned poligon) {
 		printf("%s", "triangle");
 	}
 
-	print_all_vertices(poligon, is_quad);
+	print_all_vertices(polygon, is_quad);
 	printf("%s", "\r\n");
 }
 
 /* do the operations on the current polygon */
-void do_current(long long unsigned poligon) {
+void do_current(long long unsigned polygon) {
 	int actions_to_preform[3];
 
-	if (poligon & NEW_POLIGON_MASK == 0) {
+	if (polygon & NEW_POLYGON_MASK == 0) {
 		return;
 	}
 
-	populate_actions_to_preform_array(actions_to_preform, poligon);
-	if (actions_to_preform[0]) {
-		functions_array[PRINT_POLIGON](poligon);
-	}
-
-	if (actions_to_preform[1]) {
-		functions_array[PERIMETER](poligon);
-	}
-
-	if (actions_to_preform[2]) {
-		functions_array[AREA](poligon);
-	}
+	populate_actions_to_preform_array(actions_to_preform, polygon);
+	do_actions_on_polygon(actions_to_preform, polygon);
 }
 
 /* do the operations in the parameter on the list */
-void do_all(long long unsigned poligon) {
-	int actions_to_preform[3], actions_to_preform_counter, preform_for = -1;
-	ListNode* curr = poligon_list->head->next;
+void do_all(long long unsigned polygon) {
+	int actions_to_preform[3];
+	ListNode* curr = polygon_list->head->next;
 
 	if (!curr) {
 		return;
 	}
 
-	actions_to_preform_counter = populate_actions_to_preform_array(actions_to_preform, poligon);
+	populate_actions_to_preform_array(actions_to_preform, polygon);
 	while (curr)
 	{
-		if (actions_to_preform[0]) {
-			functions_array[PRINT_POLIGON](curr->polygon);
-		}
-
-		if (actions_to_preform[1]) {
-			functions_array[PERIMETER](curr->polygon);
-		}
-
-		if (actions_to_preform[2]) {
-			functions_array[AREA](curr->polygon);
-		}
-		
+		do_actions_on_polygon(actions_to_preform, curr->polygon);
 		curr = curr->next;
 	}
 }
