@@ -1,5 +1,3 @@
-#define _CRT_SECURE_NO_WARNINGS
-
 /**************************************************/
 ///					Include						///
 /**************************************************/
@@ -141,7 +139,7 @@ void main() {
 
 	free_polygon_list(polygon_list->head);
 	free(polygon_list);
-	//printf("done");
+	printf("done");
 }
 
 /***************************************************/
@@ -180,7 +178,7 @@ void analyze_and_exec(long long unsigned polygon) {
 long long unsigned get_polygon_from_user() {
 	long long unsigned polygon = 0;
 
-	scanf("%llx", &polygon);
+	scanf_s("%llx", &polygon);
 
 	return polygon;
 }
