@@ -19,14 +19,15 @@ all: $(PROG1) test
 
 $(PROG1): $(PROGRAM).o	
 	$(ECHO)
-	$(CC) $(CFLAGS) $(LDFLAGS) -c $(PROGRAM).c -o $(PROG1)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(PROGRAM).o -o $(PROG1)
 
+$(PROGRAM).o: $(PROGRAM).c
+	$(ECHO)
+	$(CC) $(CFLAGS) $(LDFLAGS) -c $(PROGRAM).c -o $(PROGRAM).o
+	
 clean:
 	rm -vf *.o polygon.exe *.log
 
 test:
-	
 	@echo going to run test...
-	# make sure you have input file in.txt
-	# so the folowing command works
 	./$(PROG1) < in.txt > out.log
