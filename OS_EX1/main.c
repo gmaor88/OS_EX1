@@ -467,7 +467,7 @@ void perimeter(long long unsigned polygon) {
 		return;
 	}
 
-	printf(" perimeter = ");
+	printf("perimeter = ");
 	if (polygon & POLYGON_TYPE_MASK) {
 		print_quad_perimeter(polygon);
 	}
@@ -485,7 +485,7 @@ void area(long long unsigned polygon) {
 		return;
 	}
 
-	printf(" area = ");
+	printf("area = ");
 	if (polygon & POLYGON_TYPE_MASK) {
 		print_quad_area(polygon);
 	}
