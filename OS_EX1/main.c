@@ -139,7 +139,6 @@ void main() {
 
 	free_polygon_list(polygon_list->head);
 	free(polygon_list);
-	//printf("done");
 }
 
 /***************************************************/
@@ -365,10 +364,6 @@ void print_quad_area(long long unsigned polygon) {
 		polygon = polygon >> SHIFT_TO_NEXT_VERTEX;
 	}
 
-	/*distance1 = calc_distance(quad.vertices[0], quad.vertices[1]);
-	distance2 = calc_distance(quad.vertices[0], quad.vertices[3]);
-	culc_area = distance1 * distance2;*/
-
 	culc_area = 0.5 * fabs(
 		quad.vertices[0].x * quad.vertices[1].y +
 		quad.vertices[1].x * quad.vertices[2].y +
@@ -377,7 +372,7 @@ void print_quad_area(long long unsigned polygon) {
 		quad.vertices[2].x * quad.vertices[1].y -
 		quad.vertices[0].x * quad.vertices[2].y);
 
-	culc_area +=  0.5 * fabs(
+	culc_area += 0.5 * fabs(
 		quad.vertices[0].x * quad.vertices[3].y +
 		quad.vertices[3].x * quad.vertices[2].y +
 		quad.vertices[2].x * quad.vertices[0].y -
@@ -453,10 +448,8 @@ void get_vertex(long long unsigned polygon, short* x, short*y) {
 /* add new polygon to the list*/
 void add_polygon(long long unsigned polygon) {
 	ListNode *node = (ListNode*)malloc(sizeof(ListNode));
-	//init mode
 	node->polygon = polygon;
 	node->next = NULL;
-	//add to list and set the list new tail
 	polygon_list->tail->next = node;
 	polygon_list->tail = node;
 }
