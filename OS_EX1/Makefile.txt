@@ -1,0 +1,29 @@
+# Makefile for ex1-q1 winter 2018A
+
+CFLAGS = -Wall
+LDFLAGS = -lm # not really needed for this exercise
+CC = gcc -std=c99
+ECHO = echo "going to compile for target $@"
+
+OS := $(shell uname)
+ifneq (,$(findstring CYGWIN_NT,$(OS)))
+	EXT = .exe
+else
+	EXT =
+endif
+
+PROG1 = polygon$(EXT)
+
+all: $(PROG1) test
+	$ECHO
+	$CC $CFLAGS $LDFLAGS -o $PROG1
+
+clean:
+	rm -vf *.o polygon.exe *.log
+
+test:
+	
+	@echo going to run test...
+	# make sure you have input file in.txt
+	# so the folowing command works
+	./$(PROG1) < in.txt > out.log
