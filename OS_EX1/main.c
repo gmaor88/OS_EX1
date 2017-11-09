@@ -139,7 +139,7 @@ void main() {
 
 	free_polygon_list(polygon_list->head);
 	free(polygon_list);
-	printf("done");
+	//printf("done");
 }
 
 /***************************************************/
@@ -365,16 +365,32 @@ void print_quad_area(long long unsigned polygon) {
 		polygon = polygon >> SHIFT_TO_NEXT_VERTEX;
 	}
 
-	distance1 = calc_distance(quad.vertices[0], quad.vertices[1]);
+	/*distance1 = calc_distance(quad.vertices[0], quad.vertices[1]);
 	distance2 = calc_distance(quad.vertices[0], quad.vertices[3]);
-	culc_area = distance1 * distance2;
+	culc_area = distance1 * distance2;*/
+
+	culc_area = 0.5 * fabs(
+		quad.vertices[0].x * quad.vertices[1].y +
+		quad.vertices[1].x * quad.vertices[2].y +
+		quad.vertices[2].x * quad.vertices[0].y -
+		quad.vertices[1].x * quad.vertices[0].y -
+		quad.vertices[2].x * quad.vertices[1].y -
+		quad.vertices[0].x * quad.vertices[2].y);
+
+	culc_area +=  0.5 * fabs(
+		quad.vertices[0].x * quad.vertices[3].y +
+		quad.vertices[3].x * quad.vertices[2].y +
+		quad.vertices[2].x * quad.vertices[0].y -
+		quad.vertices[3].x * quad.vertices[0].y -
+		quad.vertices[2].x * quad.vertices[3].y -
+		quad.vertices[0].x * quad.vertices[2].y);
 
 	printf("%.1f", culc_area);
 }
 
 void print_quad_perimeter(long long unsigned polygon) {
 	Quad quad;
-	double culc_perimeter, distance1, distance2;
+	double culc_perimeter, distance1, distance2, distance3, distance4;
 
 	polygon = polygon >> SHIFT_TO_FIRST_VERTEX;
 	for (size_t i = 0; i < NUM_OF_VERTICES_IN_QUAD; i++)
@@ -388,8 +404,10 @@ void print_quad_perimeter(long long unsigned polygon) {
 	}
 
 	distance1 = calc_distance(quad.vertices[0], quad.vertices[1]);
-	distance2 = calc_distance(quad.vertices[0], quad.vertices[3]);
-	culc_perimeter = (distance1 * 2) + (distance2 * 2);
+	distance2 = calc_distance(quad.vertices[1], quad.vertices[2]);
+	distance3 = calc_distance(quad.vertices[2], quad.vertices[3]);
+	distance4 = calc_distance(quad.vertices[3], quad.vertices[0]);
+	culc_perimeter = distance1 + distance2 + distance3 + distance4;
 
 	printf("%.1f", culc_perimeter);
 }
