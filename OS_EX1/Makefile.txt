@@ -4,6 +4,7 @@ CFLAGS = -Wall
 LDFLAGS = -lm # not really needed for this exercise
 CC = gcc -std=c99
 ECHO = echo "going to compile for target $@"
+PROGRAM = ex1_q1
 
 OS := $(shell uname)
 ifneq (,$(findstring CYGWIN_NT,$(OS)))
@@ -15,8 +16,10 @@ endif
 PROG1 = polygon$(EXT)
 
 all: $(PROG1) test
-	$ECHO
-	$CC $CFLAGS $LDFLAGS -o $PROG1
+
+$(PROG1): $(PROGRAM).o	
+	$(ECHO)
+	$(CC) $(CFLAGS) $(LDFLAGS) -c $(PROGRAM).c -o $(PROG1)
 
 clean:
 	rm -vf *.o polygon.exe *.log

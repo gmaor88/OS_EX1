@@ -98,7 +98,7 @@ void print_triangle_perimeter(long long unsigned polygon);
 double calc_distance(Vertex vertex1, Vertex vertex2);
 void print_quad_area(long long unsigned polygon);
 void print_quad_perimeter(long long unsigned polygon);
-void handle_negatinve(int* n);
+void handle_negatinve(short* n);
 void do_actions_on_polygon(int* actions_to_preform, long long unsigned polygon);
 void get_vertex(long long unsigned polygon, short* x, short*y);
 
@@ -122,7 +122,7 @@ List* polygon_list;
 /**************************************************/
 ///						Main					///
 /**************************************************/
-void main() {
+int main() {
 	long long unsigned polygon = 0;
 
 	populate_functions_array();
@@ -139,6 +139,8 @@ void main() {
 
 	free_polygon_list(polygon_list->head);
 	free(polygon_list);
+	
+	return 0;
 }
 
 /***************************************************/
@@ -274,7 +276,7 @@ void do_for_all_from_shape(long long unsigned polygon, int is_quad) {
 void print_all_vertices(long long unsigned polygon, int is_quad) {
 	int num_of_vertices = NUM_OF_VERTICES_IN_TRIANGLE;
 
-	if (polygon & NEW_POLYGON_MASK == 0) {
+	if ((polygon & NEW_POLYGON_MASK) == 0) {
 		return;
 	}
 
@@ -351,7 +353,7 @@ double calc_distance(Vertex vertex1, Vertex vertex2)
 
 void print_quad_area(long long unsigned polygon) {
 	Quad quad;
-	double culc_area, distance1, distance2;
+	double culc_area;
 
 	polygon = polygon >> SHIFT_TO_FIRST_VERTEX;
 	for (size_t i = 0; i < NUM_OF_VERTICES_IN_QUAD; i++)
@@ -407,7 +409,7 @@ void print_quad_perimeter(long long unsigned polygon) {
 	printf("%.1f", culc_perimeter);
 }
 
-void handle_negatinve(int* n) {
+void handle_negatinve(short* n) {
 	*n |= NEGATIVE_BIT_MASK;
 	*n = ~(*n);
 	*n += 1;
@@ -456,7 +458,7 @@ void add_polygon(long long unsigned polygon) {
 
 /* calculate and print the perimeter */
 void perimeter(long long unsigned polygon) {
-	if (polygon & NEW_POLYGON_MASK == 0) {
+	if ((polygon & NEW_POLYGON_MASK) == 0) {
 		return;
 	}
 
@@ -474,7 +476,7 @@ void perimeter(long long unsigned polygon) {
 
 /* calculate and print the area */
 void area(long long unsigned polygon) {
-	if (polygon & NEW_POLYGON_MASK == 0) {
+	if ((polygon & NEW_POLYGON_MASK) == 0) {
 		return;
 	}
 
@@ -511,7 +513,7 @@ void print_polygon(long long unsigned polygon) {
 void do_current(long long unsigned polygon) {
 	int actions_to_preform[3];
 
-	if (polygon & NEW_POLYGON_MASK == 0) {
+	if ((polygon & NEW_POLYGON_MASK) == 0) {
 		return;
 	}
 
